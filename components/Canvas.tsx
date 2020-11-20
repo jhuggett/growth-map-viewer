@@ -147,7 +147,7 @@ const Canvas = props => {
 
     function handleKeyDown(e) {
       
-      const offsetAmount = 10
+      const offsetAmount = 50
 
       switch (e.keyCode) {
         case 37: {
