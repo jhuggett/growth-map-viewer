@@ -1,4 +1,4 @@
-import {Carto} from '@jhuggett/carto'
+import {Carto} from 'growth-map'
 import styled from 'styled-components'
 import { useRef } from 'react'
 import Canvas from '../components/Canvas'
