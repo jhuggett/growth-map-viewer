@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react"
 import { Cipher } from "crypto"
+import { GrowthMap } from 'growth-map'
 
 interface Coord {
   x: number
@@ -11,13 +12,13 @@ interface Size {
   height: number
 }
 
-function withinCanvasBounds(canvas, coord: Coord, size: Size) : boolean {
+function withinCanvasBounds(canvas, offset: Coord, coord: Coord, size: Size) : boolean {
 
   const A = {
-    x1: 0,
-    y1: 0,
-    x2: canvas.width,
-    y2: canvas.height
+    x1: -offset.x,
+    y1: -offset.y,
+    x2: -offset.x + canvas.width,
+    y2: -offset.y + canvas.height
   }
 
   const B = {
@@ -101,7 +102,7 @@ class CanvasDrawer {
 
   constructor(public canvas) {}
 
-  draw() {
+  draw(growthMap: GrowthMap) {
     const context = this.canvas.getContext('2d')
 
     context.canvas.width = window.innerWidth
@@ -109,13 +110,23 @@ class CanvasDrawer {
 
     context.translate(this.xOffset, this.yOffset)
 
-    const coord = {x: 0, y: 0}
-    const size = {width: 50, height: 50}
+    
+    const size = {width: 5, height: 5}
 
-    if (withinCanvasBounds(context.canvas, coord, size)) {
-      context.fillStyle = '#000000'
-      context.fillRect(coord.x, coord.y, size.width, size.height)
+    if (!growthMap || !growthMap.points) {
+      return
     }
+
+    growthMap.points.forEach(point => {
+      const coord = {x: point.coor.x, y: point.coor.y}
+      
+      if (withinCanvasBounds(context.canvas, {x: this.xOffset, y: this.yOffset}, coord, size)) {
+        context.fillStyle = '#000000'
+        context.fillRect(coord.x * size.width, coord.y * size.height, size.width, size.height)
+      }
+    });
+
+    
 
     
 
@@ -130,11 +141,15 @@ const Canvas = props => {
 
   const dragHandler = useRef(null)
 
+  const growthMap = useRef(null)
+
+  
+
   useEffect(() => {
     dragHandler.current = new DragHandler((current, start, initial) => {
       canvasDrawer.current.xOffset = initial.x + (current.x - start.x)
       canvasDrawer.current.yOffset = initial.y + (current.y - start.y)
-      canvasDrawer.current.draw()
+      canvasDrawer.current.draw(growthMap.current)
     }, () => {
       return {
         x: canvasDrawer.current.xOffset,
@@ -144,11 +159,23 @@ const Canvas = props => {
 
     const canvas = canvasRef.current
 
+    growthMap.current = new GrowthMap()
+
+    console.log('start');
+    
+    growthMap.current.growToSize(10000)
+
+    console.log('end');
+
+    console.log(growthMap.current);
+    
+    
+
     canvasDrawer.current = new CanvasDrawer(canvas)
     
 
     function handleResize() {
-      canvasDrawer.current.draw()
+      canvasDrawer.current.draw(growthMap.current)
     }
 
     window.addEventListener('resize', handleResize)
@@ -160,22 +187,22 @@ const Canvas = props => {
       switch (e.keyCode) {
         case 37: {
           canvasDrawer.current.xOffset -= offsetAmount
-          canvasDrawer.current.draw()
+          canvasDrawer.current.draw(growthMap.current)
           break
         }
         case 38: {
           canvasDrawer.current.yOffset -= offsetAmount
-          canvasDrawer.current.draw()
+          canvasDrawer.current.draw(growthMap.current)
           break
         }
         case 39: {
           canvasDrawer.current.xOffset += offsetAmount
-          canvasDrawer.current.draw()
+          canvasDrawer.current.draw(growthMap.current)
           break
         }
         case 40: {
           canvasDrawer.current.yOffset += offsetAmount
-          canvasDrawer.current.draw()
+          canvasDrawer.current.draw(growthMap.current)
           break
         }
       }
