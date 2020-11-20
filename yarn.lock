@@ -2874,10 +2874,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-growth-map@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/growth-map/-/growth-map-1.0.0.tgz#02598c80a466a7ef04165c179d12fecd6c5d5bf3"
-  integrity sha512-orOlw3PbEubOafD3M8FUSPu5kHlDbXpfyvWv7F+/P98o+RysVXSQmMRSqh/wy+/D+D7DSowrZXtuvIZlH48nFQ==
+growth-map@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/growth-map/-/growth-map-1.0.2.tgz#ee1251814a4b7ccfd3224be752e033628fad43b3"
+  integrity sha512-X2uwb7XowQxDaxiNo1Hua8oDWEh2c7IDjpmvzK6+pGhQclGuIV+Ti9FsNS9xFYzc4vpQcS3ZKTWEyHKAfR876w==
 
 has-flag@^3.0.0:
   version "3.0.0"
