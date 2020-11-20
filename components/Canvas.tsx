@@ -43,40 +43,40 @@ class DragHandler {
 
   constructor(public doThisOnDrag: (current: Coord, start: Coord, initial: Coord) => void, public getFirstOffset: () => Coord) {
 
-    window.addEventListener('mousedown', this.handleMouseDown(this))
-    window.addEventListener('mouseup', this.handleMouseUp(this))
-    window.addEventListener('mousemove', this.handleMouseMove(this))
+    window.addEventListener('mousedown', this.handleMouseDown(this, true))
+    window.addEventListener('mouseup', this.handleMouseUp(this, true))
+    window.addEventListener('mousemove', this.handleMouseMove(this, true))
 
-    window.addEventListener('touchstart', this.handleMouseDown(this))
-    window.addEventListener('touchend', this.handleMouseUp(this))
-    window.addEventListener('touchmove', this.handleMouseMove(this))
+    window.addEventListener('touchstart', this.handleMouseDown(this, false))
+    window.addEventListener('touchend', this.handleMouseUp(this, false))
+    window.addEventListener('touchmove', this.handleMouseMove(this, false))
   }
 
-  handleMouseMove(handler: DragHandler) {
+  handleMouseMove(handler: DragHandler, withMouse: boolean) {
     return (e) => {
       if (this.isDown) {
         const current = {
-          x: e.clientX,
-          y: e.clientY
+          x: withMouse ? e.clientX : e.touches[0].pageX,
+          y: withMouse ? e.clientY : e.touches[0].pageY
         }
         handler.doThisOnDrag(current, handler.start, handler.firstOffset)
       }
     }
   }
 
-  handleMouseUp(handler: DragHandler) {
+  handleMouseUp(handler: DragHandler, withMouse: boolean) {
     return () => {
       handler.isDown = false
     }
     
   }
 
-  handleMouseDown(handler: DragHandler) {
+  handleMouseDown(handler: DragHandler, withMouse: boolean) {
     return (e) => {
       handler.isDown = true
       handler.start = {
-        x: e.clientX,
-        y: e.clientY
+        x: withMouse ? e.clientX : e.touches[0].pageX,
+        y: withMouse ? e.clientY : e.touches[0].pageY
       }
       handler.firstOffset = handler.getFirstOffset()
     }
@@ -85,13 +85,13 @@ class DragHandler {
   }
 
   cleanup() {
-    window.removeEventListener('mousedown', this.handleMouseDown(this))
-    window.removeEventListener('mouseup', this.handleMouseUp(this))
-    window.removeEventListener('mousemove', this.handleMouseMove(this))
+    window.removeEventListener('mousedown', this.handleMouseDown(this, true))
+    window.removeEventListener('mouseup', this.handleMouseUp(this, true))
+    window.removeEventListener('mousemove', this.handleMouseMove(this, true))
 
-    window.removeEventListener('touchstart', this.handleMouseDown(this))
-    window.removeEventListener('touchend', this.handleMouseUp(this))
-    window.removeEventListener('touchmove', this.handleMouseMove(this))
+    window.removeEventListener('touchstart', this.handleMouseDown(this, false))
+    window.removeEventListener('touchend', this.handleMouseUp(this, false))
+    window.removeEventListener('touchmove', this.handleMouseMove(this, false))
   }
 }
 
