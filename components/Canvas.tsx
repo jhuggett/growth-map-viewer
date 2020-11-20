@@ -46,6 +46,10 @@ class DragHandler {
     window.addEventListener('mousedown', this.handleMouseDown(this))
     window.addEventListener('mouseup', this.handleMouseUp(this))
     window.addEventListener('mousemove', this.handleMouseMove(this))
+
+    window.addEventListener('touchstart', this.handleMouseDown(this))
+    window.addEventListener('touchend', this.handleMouseUp(this))
+    window.addEventListener('touchmove', this.handleMouseMove(this))
   }
 
   handleMouseMove(handler: DragHandler) {
@@ -84,6 +88,10 @@ class DragHandler {
     window.removeEventListener('mousedown', this.handleMouseDown(this))
     window.removeEventListener('mouseup', this.handleMouseUp(this))
     window.removeEventListener('mousemove', this.handleMouseMove(this))
+
+    window.removeEventListener('touchstart', this.handleMouseDown(this))
+    window.removeEventListener('touchend', this.handleMouseUp(this))
+    window.removeEventListener('touchmove', this.handleMouseMove(this))
   }
 }
 
