@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react"
 import { Cipher } from "crypto"
 import { GrowthMap } from 'growth-map'
+import { deflateRaw } from "zlib"
 
 interface Coord {
   x: number
@@ -10,68 +11,6 @@ interface Coord {
 interface Size {
   width: number
   height: number
-}
-
-function withinCanvasBounds(canvas, offset: Coord, coord: Coord, size: Size) : boolean {
-
-
-  const screen = {
-    width: canvas.width,
-    height: canvas.height,
-    center: {
-      x: offset.x + canvas.width / 2,
-      y: offset.y + canvas.height / 2
-    }
-  }
-
-  const item = {
-    width: size.width,
-    height: size.height,
-    center: {
-      x: coord.x + size.width / 2,
-      y: coord.y + size.height / 2
-    }
-  }
-
-  const distanceBetween = {
-    horizontal: (Math.abs(screen.center.x - item.center.x)) - screen.width / 2 - item.width / 2,
-    vertical: (Math.abs(screen.center.y - item.center.y)) - screen.height / 2 - item.height / 2
-  }
-
-  
-  
-
-  if (distanceBetween.horizontal < 0 && distanceBetween.vertical < 0) {
-    return true
-  }
-  console.log(offset, screen, item, distanceBetween);
-  return false
-
-
-
-
-
-
-  const A = {
-    x1: -offset.x,
-    y1: -offset.y,
-    x2: -offset.x + canvas.width,
-    y2: -offset.y + canvas.height
-  }
-
-  const B = {
-    x1: coord.x,
-    y1: coord.y,
-    x2: coord.x + size.width,
-    y2: coord.y + size.height
-  }
-
-
-  if (A.x1 < B.x2 && A.x2 > B.x1 && A.y1 < B.y2 && A.y2 > B.y1) {
-    return true
-  }
-
-  return false
 }
 
 class DragHandler {
@@ -140,6 +79,11 @@ class CanvasDrawer {
   xOffset = 0
   yOffset = 0
 
+  tileSize = {
+    width: 10,
+    height: 10
+  }
+
   drawnSquares = 0
 
   constructor(public canvas) {}
@@ -156,7 +100,7 @@ class CanvasDrawer {
     context.translate(this.xOffset, this.yOffset)
 
     
-    const size = {width: 15, height: 15}
+    const size = this.tileSize
 
     if (!growthMap || !growthMap.points) {
       return
@@ -227,7 +171,7 @@ const Canvas = props => {
 
     
     
-    growthMap.current.growToSize(10000)
+    growthMap.current.growToSize(20000)
 
     
     
@@ -271,11 +215,35 @@ const Canvas = props => {
 
     window.addEventListener('keydown', handleKeyDown)
 
+
+    function handleScroll(e) {
+      console.log(e);
+      if (e.deltaY > 0) {
+        canvasDrawer.current.tileSize = {
+          width: canvasDrawer.current.tileSize.width + 1,
+          height: canvasDrawer.current.tileSize.height + 1
+        }
+
+        canvasDrawer.current.draw(growthMap.current)
+      } else {
+        if (canvasDrawer.current.tileSize.width <= 1 || canvasDrawer.current.tileSize.height <= 1) return
+        canvasDrawer.current.tileSize = {
+          width: canvasDrawer.current.tileSize.width - 1,
+          height: canvasDrawer.current.tileSize.height - 1
+        }
+
+        canvasDrawer.current.draw(growthMap.current)
+      }
+    }
+
+    window.addEventListener('wheel', handleScroll)
+
     canvasDrawer.current.draw()
 
     return () => {
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('scroll', handleScroll)
       dragHandler.current.cleanup()
     }
   }, [])
