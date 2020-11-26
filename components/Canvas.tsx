@@ -14,6 +14,44 @@ interface Size {
 
 function withinCanvasBounds(canvas, offset: Coord, coord: Coord, size: Size) : boolean {
 
+
+  const screen = {
+    width: canvas.width,
+    height: canvas.height,
+    center: {
+      x: offset.x + canvas.width / 2,
+      y: offset.y + canvas.height / 2
+    }
+  }
+
+  const item = {
+    width: size.width,
+    height: size.height,
+    center: {
+      x: coord.x + size.width / 2,
+      y: coord.y + size.height / 2
+    }
+  }
+
+  const distanceBetween = {
+    horizontal: (Math.abs(screen.center.x - item.center.x)) - screen.width / 2 - item.width / 2,
+    vertical: (Math.abs(screen.center.y - item.center.y)) - screen.height / 2 - item.height / 2
+  }
+
+  
+  
+
+  if (distanceBetween.horizontal < 0 && distanceBetween.vertical < 0) {
+    return true
+  }
+  console.log(offset, screen, item, distanceBetween);
+  return false
+
+
+
+
+
+
   const A = {
     x1: -offset.x,
     y1: -offset.y,
@@ -38,6 +76,8 @@ function withinCanvasBounds(canvas, offset: Coord, coord: Coord, size: Size) : b
 
 class DragHandler {
   isDown: boolean
+
+  
 
   firstOffset: Coord                
   start: Coord
@@ -100,9 +140,14 @@ class CanvasDrawer {
   xOffset = 0
   yOffset = 0
 
+  drawnSquares = 0
+
   constructor(public canvas) {}
 
   draw(growthMap: GrowthMap) {
+    console.log('Squares: ', this.drawnSquares);
+    this.drawnSquares = 0
+
     const context = this.canvas.getContext('2d')
 
     context.canvas.width = window.innerWidth
@@ -111,18 +156,37 @@ class CanvasDrawer {
     context.translate(this.xOffset, this.yOffset)
 
     
-    const size = {width: 5, height: 5}
+    const size = {width: 15, height: 15}
 
     if (!growthMap || !growthMap.points) {
       return
     }
 
+    const grid = {
+      xstart: Math.floor(-this.xOffset / size.width) - 1,
+      xend: Math.floor((-this.xOffset + this.canvas.width) / size.width) + 1,
+      ystart: Math.floor(-this.yOffset / size.height) - 1,
+      yend: Math.floor((-this.yOffset + this.canvas.height) / size.height) + 1
+    }
+
+    console.log(grid);
+    
+
+
     growthMap.points.forEach(point => {
       const coord = {x: point.coor.x, y: point.coor.y}
+      if (point.landType != 0) return
+
       
-      if (withinCanvasBounds(context.canvas, {x: this.xOffset, y: this.yOffset}, coord, size)) {
-        context.fillStyle = '#000000'
+
+      if (coord.x <= grid.xend && coord.x >= grid.xstart && coord.y <= grid.yend && coord.y >= grid.ystart) {
+        context.fillStyle = 'white'
         context.fillRect(coord.x * size.width, coord.y * size.height, size.width, size.height)
+        // context.fillStyle = 'black'
+        // context.textAlign="center"
+        // context.textBaseline = "middle"
+        // context.fillText(`(${coord.x}, ${coord.y})`, coord.x * size.width + size.width / 2, coord.y * size.height + size.height / 2)
+        this.drawnSquares++
       }
     });
 
@@ -161,13 +225,10 @@ const Canvas = props => {
 
     growthMap.current = new GrowthMap()
 
-    console.log('start');
+    
     
     growthMap.current.growToSize(10000)
 
-    console.log('end');
-
-    console.log(growthMap.current);
     
     
 
